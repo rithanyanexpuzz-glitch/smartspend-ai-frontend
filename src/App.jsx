@@ -11,6 +11,10 @@ import InsightsPage from './pages/InsightsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import RecurringPage from './pages/RecurringPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import GoalsPage from './pages/GoalsPage.jsx';
+import AdvisorPage from './pages/AdvisorPage.jsx';
+import SplitsPage from './pages/SplitsPage.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 
 function PrivateRoute({ children }) {
     const { user, loading } = useAuth();
@@ -33,6 +37,7 @@ function PublicRoute({ children }) {
 export default function App() {
     return (
         <Routes>
+            <Route path="/welcome" element={<LandingPage />} />
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
@@ -41,6 +46,9 @@ export default function App() {
                 <Route path="expenses" element={<ExpensesPage />} />
                 <Route path="income" element={<IncomePage />} />
                 <Route path="budgets" element={<BudgetsPage />} />
+                <Route path="splits" element={<SplitsPage />} />
+                <Route path="goals" element={<GoalsPage />} />
+                <Route path="advisor" element={<AdvisorPage />} />
                 <Route path="insights" element={<InsightsPage />} />
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="recurring" element={<RecurringPage />} />

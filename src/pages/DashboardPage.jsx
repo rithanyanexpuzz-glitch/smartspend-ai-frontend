@@ -5,9 +5,9 @@ import {
     PieChart, Pie, Cell, Tooltip,
     ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend
 } from 'recharts';
-import { TrendingUp, TrendingDown, Wallet, PiggyBank, Plus, ArrowRight } from 'lucide-react';
-import { dashboardAPI } from '../api';
-import { formatINR, formatDate, formatMonth, currentMonth, CATEGORY_COLORS, CATEGORY_ICONS } from '../utils/helpers.js';
+import { TrendingUp, TrendingDown, Wallet, PiggyBank, Plus, ArrowRight, Award, ShieldCheck, Download, FileSpreadsheet } from 'lucide-react';
+import { dashboardAPI, reportsAPI } from '../api';
+import { formatINR, formatDate, formatMonth, currentMonth, downloadBlob, CATEGORY_COLORS, CATEGORY_ICONS } from '../utils/helpers.js';
 import toast from 'react-hot-toast';
 
 const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -51,6 +51,21 @@ export default function DashboardPage() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [month, setMonth] = useState(currentMonth());
+
+    const [downloading, setDownloading] = useState(false);
+
+    const handleDownloadPDF = async () => {
+        setDownloading(true);
+        try {
+            const res = await reportsAPI.downloadPDF(month);
+            downloadBlob(new Blob([res.data], { type: 'application/pdf' }), `smartspend_statement_${month}.pdf`);
+            toast.success(`Statement for ${formatMonth(month)} downloaded! 📄`);
+        } catch {
+            toast.error('Failed to download PDF statement');
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -101,6 +116,14 @@ export default function DashboardPage() {
                                 })}
                             </select>
                         </div>
+                        <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={handleDownloadPDF}
+                            disabled={downloading}
+                            title="Download Official Monthly PDF Tax Statement"
+                        >
+                            {downloading ? <span className="spinner" /> : <><Download size={14} /> PDF Statement</>}
+                        </button>
                         <button className="btn btn-primary btn-sm" onClick={() => navigate('/expenses')} id="dash-add-expense">
                             <Plus size={14} /> Add Expense
                         </button>
@@ -131,6 +154,21 @@ export default function DashboardPage() {
                     <div className="stat-icon purple"><PiggyBank size={20} color="var(--purple-400)" /></div>
                     <div className="stat-value">{summary.savings_rate?.toFixed(1) || '0.0'}%</div>
                     <div className="stat-label">Savings Rate</div>
+                </div>
+                {/* Financial Health Score Card */}
+                <div className="stat-card" style={{ borderLeft: '3px solid var(--emerald-400)', background: 'linear-gradient(135deg, var(--bg-750), rgba(16, 185, 129, 0.05))' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="stat-icon green" style={{ width: 32, height: 32 }}>
+                            <ShieldCheck size={16} color="var(--emerald-400)" />
+                        </div>
+                        <span className="badge badge-green" style={{ fontSize: 10 }}>
+                            {data.health_score?.status || 'Good'}
+                        </span>
+                    </div>
+                    <div className="stat-value" style={{ color: 'var(--emerald-400)', fontSize: 24, marginTop: 4 }}>
+                        {data.health_score?.score || 75} / 100
+                    </div>
+                    <div className="stat-label">Financial Health Score</div>
                 </div>
             </div>
 

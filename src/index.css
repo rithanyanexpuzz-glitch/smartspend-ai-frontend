@@ -85,6 +85,31 @@
   --sidebar-width: 260px;
 }
 
+/* ── Light Mode Override ───────────────────────────────────── */
+[data-theme="light"] {
+  --bg-950: #f0f2f5;
+  --bg-900: #f8fafc;
+  --bg-800: #ffffff;
+  --bg-750: #f1f5f9;
+  --bg-700: #e2e8f0;
+  --bg-600: #cbd5e1;
+  --bg-500: #94a3b8;
+
+  --text-50:  #0f172a;
+  --text-100: #1e293b;
+  --text-200: #475569;
+  --text-300: #64748b;
+  --text-400: #94a3b8;
+
+  --border:       rgba(203, 213, 225, 0.8);
+  --border-light: rgba(226, 232, 240, 0.9);
+  --border-accent:rgba(16,185,129,0.3);
+
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 14px rgba(0,0,0,0.07);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.08);
+}
+
 /* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; height: 100%; }

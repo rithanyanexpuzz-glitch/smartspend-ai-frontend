@@ -4,6 +4,7 @@ import api from './client';
 export const authAPI = {
     register: (data) => api.post('/auth/register', data),
     login: (data) => api.post('/auth/login', data),
+    demoLogin: () => api.post('/auth/demo-login'),
     refresh: () => api.post('/auth/refresh'),
     getProfile: () => api.get('/auth/profile'),
     updateProfile: (data) => api.put('/auth/profile', data),
@@ -91,4 +92,26 @@ export const notificationsAPI = {
 // ── Health ────────────────────────────────────────────────────────────────
 export const healthAPI = {
     check: () => api.get('/health'),
+};
+
+// ── Savings Goals ─────────────────────────────────────────────────────────
+export const goalsAPI = {
+    list: () => api.get('/goals/'),
+    create: (data) => api.post('/goals/', data),
+    update: (id, data) => api.put(`/goals/${id}`, data),
+    delete: (id) => api.delete(`/goals/${id}`),
+};
+
+// ── AI Financial Advisor & SMS Parser ─────────────────────────────────────
+export const advisorAPI = {
+    chat: (message) => api.post('/advisor/chat', { message }),
+    parseSMS: (sms_text) => api.post('/advisor/parse-sms', { sms_text }),
+};
+
+// ── Expense Splits (Splitwise) ─────────────────────────────────────────────
+export const splitsAPI = {
+    list: () => api.get('/splits/'),
+    create: (data) => api.post('/splits/', data),
+    toggleSettle: (memberId) => api.put(`/splits/members/${memberId}/toggle-settle`),
+    delete: (id) => api.delete(`/splits/${id}`),
 };

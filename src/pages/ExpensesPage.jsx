@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit3, X, Search, Brain, CheckCircle } from 'lucide-react';
-import { expensesAPI } from '../api';
+import { Plus, Trash2, Edit3, X, Search, Brain, CheckCircle, MessageSquareText, Sparkles } from 'lucide-react';
+import { expensesAPI, advisorAPI } from '../api';
 import { formatINR, formatDate, currentMonth, CATEGORY_COLORS, CATEGORY_ICONS } from '../utils/helpers.js';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,8 @@ function ExpenseModal({ open, onClose, onSaved, initial }) {
     const [loading, setLoading] = useState(false);
     const [predicting, setPredicting] = useState(false);
     const [prediction, setPrediction] = useState(null);
+    const [smsInput, setSmsInput] = useState('');
+    const [showSmsBox, setShowSmsBox] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -31,8 +33,35 @@ function ExpenseModal({ open, onClose, onSaved, initial }) {
                 ...(initial || {})
             });
             setPrediction(null);
+            setSmsInput('');
+            setShowSmsBox(false);
         }
     }, [open, initial]);
+
+    const handleParseSMS = async () => {
+        if (!smsInput.trim()) {
+            toast.error('Paste bank SMS text first');
+            return;
+        }
+        try {
+            const { data } = await advisorAPI.parseSMS(smsInput);
+            if (data.is_valid && data.amount) {
+                setForm(p => ({
+                    ...p,
+                    amount: String(data.amount),
+                    description: data.merchant || 'UPI Payment',
+                    category_name: data.predicted_category || 'Other',
+                    notes: `Auto-parsed from SMS: "${smsInput.slice(0, 80)}..."`,
+                }));
+                toast.success(`Extracted: ₹${data.amount} at ${data.merchant}! ✨`);
+                setShowSmsBox(false);
+            } else {
+                toast.error('Could not detect amount from text. Please enter manually.');
+            }
+        } catch {
+            toast.error('Failed to parse SMS');
+        }
+    };
 
     const handlePredict = async () => {
         if (!form.description.trim()) return;
@@ -75,6 +104,41 @@ function ExpenseModal({ open, onClose, onSaved, initial }) {
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
+                        {/* SMS / UPI Auto Paste Shortcut */}
+                        {!isEdit && (
+                            <div style={{ marginBottom: 14 }}>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--emerald-500)', color: 'var(--emerald-400)' }}
+                                    onClick={() => setShowSmsBox(!showSmsBox)}
+                                >
+                                    <Sparkles size={13} /> {showSmsBox ? 'Hide SMS Parser' : '✨ Paste Bank/UPI SMS to Auto-Fill'}
+                                </button>
+
+                                {showSmsBox && (
+                                    <div style={{ marginTop: 8, padding: 10, background: 'var(--bg-750)', borderRadius: 8, border: '1px solid var(--border-light)' }}>
+                                        <textarea
+                                            className="textarea"
+                                            rows={2}
+                                            placeholder="Paste SMS here (e.g., 'Rs. 450 debited for Swiggy on 12-Nov' or 'Paid Rs 1200 at Shell Petrol Bunk')..."
+                                            value={smsInput}
+                                            onChange={e => setSmsInput(e.target.value)}
+                                            style={{ fontSize: 12 }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm"
+                                            style={{ marginTop: 6, width: '100%', justifyContent: 'center' }}
+                                            onClick={handleParseSMS}
+                                        >
+                                            Auto-Fill Details
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="form-group">
                             <label className="label">Description *</label>
                             <div style={{ display: 'flex', gap: 8 }}>

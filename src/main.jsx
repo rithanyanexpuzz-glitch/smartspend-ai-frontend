@@ -6,9 +6,21 @@ import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import './index.css';
 
+// Register Service Worker for PWA (Installable Mobile App)
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <BrowserRouter>
+        <BrowserRouter
+            future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+            }}
+        >
             <AuthProvider>
                 <App />
                 <Toaster

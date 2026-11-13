@@ -3,10 +3,11 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, CreditCard, TrendingUp, Target, Lightbulb,
     FileText, User, LogOut, ChevronRight, Menu, X, Brain,
-    Repeat, Bell, Check, CheckCheck, Trash2
+    Repeat, Bell, Check, CheckCheck, Trash2, PiggyBank, Bot, Users, Sun, Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { notificationsAPI } from '../api';
+import QuickAddFAB from './QuickAddFAB.jsx';
 import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
@@ -14,6 +15,9 @@ const NAV_ITEMS = [
     { path: '/expenses', icon: CreditCard, label: 'Expenses' },
     { path: '/income', icon: TrendingUp, label: 'Income' },
     { path: '/budgets', icon: Target, label: 'Budgets' },
+    { path: '/splits', icon: Users, label: 'Split Bills' },
+    { path: '/goals', icon: PiggyBank, label: 'Savings Goals' },
+    { path: '/advisor', icon: Bot, label: 'AI Advisor' },
     { path: '/recurring', icon: Repeat, label: 'Recurring' },
     { path: '/insights', icon: Lightbulb, label: 'AI Insights' },
     { path: '/reports', icon: FileText, label: 'Reports' },
@@ -35,6 +39,16 @@ export default function Layout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    };
 
     // ── Notifications state ──────────────────────────────
     const [notifications, setNotifications] = useState([]);
@@ -191,6 +205,16 @@ export default function Layout() {
                     </div>
 
                     <div className="topbar-actions">
+                        {/* Theme Toggle Button */}
+                        <button
+                            className="btn btn-ghost btn-icon"
+                            onClick={toggleTheme}
+                            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            style={{ marginRight: 6 }}
+                        >
+                            {theme === 'dark' ? <Sun size={17} color="var(--amber-400)" /> : <Moon size={17} color="var(--blue-500)" />}
+                        </button>
+
                         {/* Notification bell */}
                         <div ref={bellRef} style={{ position: 'relative' }}>
                             <button
@@ -297,6 +321,9 @@ export default function Layout() {
                 <main className="page-body">
                     <Outlet />
                 </main>
+
+                {/* Global Floating Quick Add Button with Voice */}
+                <QuickAddFAB />
             </div>
         </div>
     );

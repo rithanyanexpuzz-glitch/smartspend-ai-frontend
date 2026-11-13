@@ -7,7 +7,7 @@ import { authAPI } from '../api';
 import { useAuth } from '../context/AuthContext.jsx';
 import toast from 'react-hot-toast';
 
-const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'SGD'];
+const CURRENCIES = ['INR', 'USD', 'EUR', 'GBP'];
 
 function getInitials(name = '') {
     return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U';
@@ -252,6 +252,7 @@ export default function ProfilePage() {
                                 <Phone size={15} className="input-icon" />
                                 <input className="input has-icon" type="tel" name="phone"
                                     placeholder="+91 98765 43210" value={profile.phone}
+                                    maxLength={14}
                                     onChange={handleProfileChange} />
                             </div>
                         </div>
@@ -398,7 +399,7 @@ export default function ProfilePage() {
                         <div className="form-group" style={{ marginBottom: 20 }}>
                             <label className="label">
                                 <MessageCircle size={12} style={{ marginRight: 5 }} />
-                                WhatsApp Number (with country code)
+                                WhatsApp Number (Indian Mobile: 10 Digits or +91)
                             </label>
                             <div className="input-wrap">
                                 <Phone size={15} className="input-icon" />
@@ -406,13 +407,14 @@ export default function ProfilePage() {
                                     className="input has-icon"
                                     type="tel"
                                     name="whatsapp_number"
-                                    placeholder="+91 98765 43210"
+                                    placeholder="+91 98765 43210 or 9876543210"
                                     value={notifSettings.whatsapp_number}
+                                    maxLength={14}
                                     onChange={e => handleNotifChange('whatsapp_number', e.target.value)}
                                 />
                             </div>
                             <div style={{ fontSize: 11, color: 'var(--text-300)', marginTop: 5 }}>
-                                ⚠️ Must first join Twilio Sandbox: send <code>join &lt;code&gt;</code> to <strong>+1 415 523 8886</strong> on WhatsApp.
+                                🇮🇳 Indian Mobile Number: +91 தானாகவே இணைக்கப்பட்டு WhatsApp alert அனுப்பப்படும்.
                             </div>
                         </div>
                     )}
